@@ -8,7 +8,7 @@ on:
 jobs:
 
   tests:
-    name: PEP8 check
+    name: PEP8 checking
     runs-on: ubuntu-latest
     steps:
     - name: Check out code
@@ -24,7 +24,7 @@ jobs:
         pip install -r ./backend/foodgram/requirements.txt
     - name: Test with flake8
       run: |
-        python -m flake8 backend/foodgram/foodgram/
+        python -m flake8 backend/foodgram/
 
 
   build_and_push_to_docker_hub:
