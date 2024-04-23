@@ -20,8 +20,6 @@ services:
       - media:/media/
     depends_on: 
       - db
-    env_file:
-      - .env
 
   frontend:
     image: olga1611/foodgram_frontend
