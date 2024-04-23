@@ -26,8 +26,8 @@ jobs:
 #      run: |
 #        python -m flake8 backend/foodgram/
 
-  
-  build_backend_and_push_to_docker_hub:
+
+  build_and_push_to_docker_hub:
     name: Push Docker image to DockerHub
     runs-on: ubuntu-latest
 #    needs: tests
