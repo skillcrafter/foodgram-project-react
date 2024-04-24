@@ -32,6 +32,8 @@ services:
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - static:/frontend_static
+    depends_on: 
+      - nginx
 
   nginx:
     image: olga1611/foodgram_gateway
