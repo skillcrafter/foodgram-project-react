@@ -8,7 +8,7 @@ SECRET_KEY = 'django-insecure-m-sn$(*ln0(c^qd!4@@!7gix^p+@2amg9i_wr^c8vez(zihtwn
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'backend', '192.168.121.133', '158.160.28.213']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'backend', '192.168.121.133', 'foodgram-so.ddns.net', '158.160.28.213']
 
 INSTALLED_APPS = [
     'recipes.apps.RecipesConfig',
