@@ -6,15 +6,19 @@ volumes:
   media:
 
 services:
+
   db:
     image: postgres:13.10
-    env_file: .env
+    env_file:
+        .env
     volumes:
       - pg_data:/var/lib/postgresql/data
 
   backend:
     image: olga1611/foodgram_backend
     env_file: .env
+    ports:
+      - "8000:8000"
     volumes:
       - static:/backend_static
       - media:/media/
@@ -24,11 +28,11 @@ services:
   frontend:
     image: olga1611/foodgram_frontend
 #    env_file: .env
-    command: cp -r /app/build/. /frontend_static/
+#    command: cp -r /app/build/. /frontend_static/
     volumes:
       - static:/frontend_static
 
-  gateway:
+  nginx:
     image: olga1611/foodgram_gateway
     env_file: .env
     volumes:
@@ -36,4 +40,3 @@ services:
       - media:/media/
     ports:
       - 9100:80
-
