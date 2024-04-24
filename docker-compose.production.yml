@@ -17,7 +17,7 @@ services:
   backend:
     image: olga1611/foodgram_backend
     env_file: .env
-    ports:
+#    ports:
 #      - "8000:8000"
     volumes:
       - static:/backend_static
