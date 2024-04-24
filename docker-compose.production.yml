@@ -27,8 +27,8 @@ services:
 
   frontend:
     image: olga1611/foodgram_frontend
-#    env_file: .env
-#    command: cp -r /app/build/. /frontend_static/
+    env_file: .env
+    command: cp -r /app/build/. /frontend_static/
     volumes:
       - static:/frontend_static
 
