@@ -46,4 +46,5 @@ services:
       - static:/static/
       - media:/media/
     ports:
-      - 8000:80
+      - 8100:80
+#      - 8000:80
