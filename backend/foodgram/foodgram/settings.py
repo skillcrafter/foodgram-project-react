@@ -6,7 +6,7 @@ APP_DIR  = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-m-sn$(*ln0(c^qd!4@@!7gix^p+@2amg9i_wr^c8vez(zihtwn'
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'backend', '192.168.121.133', '158.160.28.213']
 
