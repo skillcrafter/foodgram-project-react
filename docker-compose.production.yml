@@ -24,6 +24,7 @@ services:
       - media:/media/
     depends_on: 
       - db
+      - nginx
 
   frontend:
     image: olga1611/foodgram_frontend
