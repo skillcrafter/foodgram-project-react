@@ -118,12 +118,12 @@ DJOSER = {
         'user': 'users.serializers.UserSerializer',
         'current_user': 'users.serializers.UserSerializer',
     },
-    'PERMISSIONS': {
-        'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
-        # 'user_list': ['rest_framework.permissions.IsAuthenticated'],
-        'user': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
-        # 'token': ['rest_framework.permissions.IsAuthenticated'],
-    },
+    # 'PERMISSIONS': {
+    #     'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
+    #     # 'user_list': ['rest_framework.permissions.IsAuthenticated'],
+    #     'user': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
+    #     # 'token': ['rest_framework.permissions.IsAuthenticated'],
+    # },
 }
 
 REST_FRAMEWORK = {
