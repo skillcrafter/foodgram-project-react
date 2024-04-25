@@ -16,7 +16,8 @@ DEBUG = True
 #ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.121.132', '192.168.79.135',
 #                 '158.160.28.213']
 #ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'backend', '192.168.121.133', 'foodgram-so.ddns.net', '158.160.28.213']
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'foodgram-so.ddns.net', 'backend']
+#ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'foodgram-so.ddns.net', 'backend']
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'recipes.apps.RecipesConfig',
