@@ -2,34 +2,13 @@ from django_filters.rest_framework import FilterSet, filters
 
 from django.contrib.auth import get_user_model
 
-from recipes.models import Ingredient, Recipe, Tag
+from recipes.models import Recipe, Tag
 
 User = get_user_model()
 
 
-class IngredientFilter(FilterSet):
-    """Фильтр ингредиентов."""
-
-    name_starts_with = filters.CharFilter(
-        field_name='name',
-        lookup_expr='istartswith',
-        label='Начинается с',
-    )
-
-    name_contains = filters.CharFilter(
-        field_name='name',
-        lookup_expr='icontains',
-        label='Содержит',
-    )
-
-    class Meta:
-        model = Ingredient
-        fields = ['name_starts_with', 'name_contains']
-
-
 class RecipeFilter(FilterSet):
     """Фильтрация рецептов."""
-
     tags = filters.ModelMultipleChoiceFilter(
         queryset=Tag.objects.all(),
         field_name='tags__slug',

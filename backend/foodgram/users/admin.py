@@ -1,10 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.admin import UserAdmin
 
 from .models import Subscribe
-from .models import User
+
 User = get_user_model()
 
 
@@ -34,15 +33,14 @@ class UserAdmin(BaseUserAdmin):
     )
     empty_value_display = 'Не задано'
 
+
 class SubscribeAdmin(admin.ModelAdmin):
+    """Подписки"""
     list_display = ('id', 'user', 'author')
     search_fields = ('user', 'author')
     list_filter = ('user', 'author')
     empty_value_display = 'Не задано'
+
+
 admin.site.register(Subscribe, SubscribeAdmin)
 admin.site.register(User, UserAdmin)
-
-
-admin.site.empty_value_display = 'Не задано'
-
-

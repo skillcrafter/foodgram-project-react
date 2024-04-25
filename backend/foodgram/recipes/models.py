@@ -1,14 +1,15 @@
 import uuid
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
 
-from foodgram.constants import MIN_VALUE, message
+from foodgram.constants import (MIN_VALUE,
+                                MAX_FIELD_LENGTH,
+                                MAX_COLOR_LENGTH,
+                                message,
+                                LENGTH)
 
 User = get_user_model()
 
@@ -17,11 +18,11 @@ class Ingredient(models.Model):
     """Модель ингредиентов"""
     name = models.CharField(
         unique=True,
-        max_length=128,
+        max_length=MAX_FIELD_LENGTH,
         verbose_name='Название',
     )
     measurement_unit = models.CharField(
-        max_length=128,
+        max_length=MAX_FIELD_LENGTH,
         verbose_name='Единица измерения',
     )
 
@@ -29,8 +30,6 @@ class Ingredient(models.Model):
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
 
-    # Админка Спринт 6/12: 6 спринт → Тема 3/6: Админ-зона Django → Урок 2/3
-    # вывод записей так, чтобы в качестве заголовка показывалось название
     def __str__(self):
         return self.name
 
@@ -39,13 +38,16 @@ class Tag(models.Model):
     """Модель тегов"""
     name = models.CharField(
         unique=True,
-        max_length=128,
+        max_length=MAX_FIELD_LENGTH,
         verbose_name='Тег',
     )
-    color = models.CharField(unique=True, max_length=16, verbose_name='Цвет', default='#c8ff3b')
+    color = models.CharField(unique=True,
+                             max_length=MAX_COLOR_LENGTH,
+                             verbose_name='Цвет',
+                             default='#c8ff3b', )
     slug = models.SlugField(
         unique=True,
-        max_length=100,
+        max_length=LENGTH,
         default=uuid.uuid1,
         verbose_name='Слаг', )
 
@@ -53,8 +55,6 @@ class Tag(models.Model):
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
 
-    # Админка Спринт 6/12: 6 спринт → Тема 3/6: Админ-зона Django → Урок 2/3
-    # вывод записей так, чтобы в качестве заголовка показывалось название
     def __str__(self):
         return self.name
 
@@ -69,7 +69,7 @@ class Recipe(models.Model):
         verbose_name='Автор записи',
     )
     name = models.CharField(
-        max_length=128,
+        max_length=MAX_FIELD_LENGTH,
         verbose_name='Название',
     )
     image = models.ImageField(
@@ -82,8 +82,6 @@ class Recipe(models.Model):
     )
     ingredients = models.ManyToManyField(
         Ingredient,
-        # related_name='recipes',
-        # to=Ingredient,
         through='RecipeIngredient',
         verbose_name='Ингредиенты',
     )
@@ -99,25 +97,17 @@ class Recipe(models.Model):
         verbose_name='Тег',
     )
 
-    # pub_date = models.DateTimeField(
-    #     verbose_name='Дата публикации',
-    #     auto_now_add=True
-    # )
     class Meta:
         ordering = ('name',)
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
-
-    # Админка Спринт 6/12: 6 спринт → Тема 3/6: Админ-зона Django → Урок 2/3
-    # вывод записей так, чтобы в качестве заголовка показывалось название
-    # def __str__(self):        # Версия Оли
-    #     return f'{self.author} - {self.name}'
 
     def __str__(self):
         return self.name
 
 
 class RecipeIngredient(models.Model):
+    """Модель Ингредиенты в рецептах."""
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -146,14 +136,6 @@ class RecipeIngredient(models.Model):
             f'{self.amount}/'
             f'{self.ingredient.measurement_unit}'
         )
-
-    # Версия Вадима
-    # def __str__(self):
-    #     return (
-    #         f'{self.recipe.name}: '
-    #         f'{self.ingredient.name} - '
-    #         f'{self.amount}/'
-    #     )
 
 
 class Favorite(models.Model):

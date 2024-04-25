@@ -2,11 +2,8 @@ import base64
 import re
 
 from django.core.files.base import ContentFile
-from rest_framework import serializers, status
-from rest_framework.exceptions import AuthenticationFailed, PermissionDenied, \
-    NotFound
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
+from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.serializers import ValidationError
 
@@ -24,6 +21,7 @@ from users.serializers import UserSerializer
 
 
 class Base64ImageField(serializers.ImageField):
+    """Кастомный сериализатор для работы с изображением."""
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
             format, imgstr = data.split(';base64,')
@@ -36,12 +34,15 @@ class Base64ImageField(serializers.ImageField):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+    """Сериализатор ингредиентов."""
     class Meta:
         model = Ingredient
         fields = "__all__"
 
 
 class RecipesIngredientsSerializer(serializers.ModelSerializer):
+    """Сериализатор ингредиентов в рецепте."""
+
     id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
@@ -73,6 +74,7 @@ class AddIngredientRecipeSerializer(serializers.ModelSerializer):
 
 
 class Hex2NameColor(serializers.Field):
+    """Сериализатор для проверки формата цвета (hex) """
     def to_representation(self, value):
         return value
 
@@ -83,16 +85,12 @@ class Hex2NameColor(serializers.Field):
 
 
 class TagSerializer(serializers.ModelSerializer):
+    """Сериализатор тегов."""
     color = Hex2NameColor()
 
     class Meta:
         model = Tag
-        fields = [
-            'id',
-            'name',
-            'color',
-            'slug'
-        ]
+        fields = '__all__'
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -141,17 +139,9 @@ class RecipeSerializer(serializers.ModelSerializer):
             user=request.user, recipe_id=obj
         ).exists()
 
-    # def to_representation(self, instance):
-    #     representation = super().to_representation(instance)
-    #     request = self.context.get('request')
-    #     if request is not None and not request.user.is_anonymous:
-    #         is_in_shopping_cart = ShoppingCart.objects.filter(
-    #             user=request.user, recipe_id=instance.id
-    #         ).exists()
-    #         representation['is_in_shopping_cart'] = is_in_shopping_cart
-    #     return representation
 
 class RecipeShortSerializer(serializers.ModelSerializer):
+    """Сериализатор для краткой информации о рецептах."""
     class Meta:
         model = Recipe
         fields = (
@@ -169,6 +159,7 @@ class RecipeShortSerializer(serializers.ModelSerializer):
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
+    """Сериализатор корзины покупок."""
     class Meta:
         model = ShoppingCart
         fields = '__all__'
@@ -188,6 +179,7 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
 
 
 class CreateRecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор для краткой информации о рецептах."""
     author = UserSerializer(read_only=True)
     ingredients = AddIngredientRecipeSerializer(many=True)
     image = Base64ImageField()
@@ -230,7 +222,6 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
                     {'ingredients': f'Ингредиент с '
                                     f'id={ingredient_id} не существует'}
                 )
-
         if len(tags) != len(set(tags)):
             raise serializers.ValidationError("Теги не должны повторяться.")
 
@@ -305,22 +296,9 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
             'request': self.context.get('request')
         }).data
 
-    # def check_authentication(self):
-    #     user = self.context.get('request').user
-    #     if not user.is_authenticated:
-    #         raise AuthenticationFailed(
-    #             {"detail": "Незарегистрированные пользователи "
-    #                        "не могут создавать рецепты."}
-    #         )
-
-    # def validate_tags(self, tags):
-    #     print(' 2 !!!!!!!!tags= ', tags)
-    #     if len(tags) != len(set(tags)):
-    #         raise serializers.ValidationError("Теги не должны повторяться.")
-    #     return tags
-
 
 class FavoriteListSerializer(serializers.ModelSerializer):
+    """Cериализатор сведений об избранных рецептах."""
     class Meta:
         model = Recipe
         fields = [
@@ -338,6 +316,7 @@ class FavoriteListSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
+    """Cериализатор добавления в избранное."""
     class Meta:
         model = Favorite
         fields = [

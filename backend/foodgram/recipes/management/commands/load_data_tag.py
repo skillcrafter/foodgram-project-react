@@ -6,7 +6,6 @@ class Command(BaseCommand):
     help = 'Загрузить данные о тегах в базу данных'
 
     def handle(self, *args, **options):
-        # Подобрать цвета
         data = [
             {'name': 'Завтрак', 'color': '#c8ff30', 'slug': 'breakfast'},
             {'name': 'Обед', 'color': '#E26C2D', 'slug': 'dinner'},

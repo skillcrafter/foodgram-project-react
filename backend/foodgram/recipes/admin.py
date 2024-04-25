@@ -1,10 +1,7 @@
 from django.contrib import admin
-# Импортируем модель, чтоб добавить в админку
 from recipes.models import Recipe, Ingredient, Tag, \
     RecipeIngredient, Favorite, ShoppingCart
 
-
-# Регистрируем модель в админке.
 
 class TagAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'color', 'slug',)
@@ -33,7 +30,7 @@ class RecipeIngredientInline(admin.TabularInline):
     readonly_fields = ('ingredient_measurement_unit',)
 
     def ingredient_measurement_unit(self, instance):
-        return instance.ingredient.measurement_unit  # Получаем единицу измерения из связанного ингредиента
+        return instance.ingredient.measurement_unit
 
     ingredient_measurement_unit.short_description = 'Единица измерения'
 
@@ -46,10 +43,9 @@ class RecipeAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('author', 'name', 'tags',)
     list_display_links = ('name',)
-    list_display = ('name', 'author',)
     inlines = [
         RecipeIngredientInline, ]
-    # filter_vertical = ('tags',)
+    filter_vertical = ('tags',)
 
 
 class FavoriteAdmin(admin.ModelAdmin):
@@ -72,7 +68,7 @@ class ShoppingCartAdmin(admin.ModelAdmin):
     list_display_links = ('user',)
 
 
-# Регистрируем кастомное представление админ-зоны
+"""Регистрируем кастомное представление админ-зоны"""
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Ingredient, IngredientAdmin)

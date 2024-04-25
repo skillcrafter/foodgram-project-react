@@ -17,10 +17,6 @@ class Command(BaseCommand):
                     if created:
                         self.stdout.write(self.style.SUCCESS(
                             f'Ингредиенты "{ingredient}" успешно добавлены'))
-                    # else:
-                    #     self.stdout.write(self.style.WARNING(
-                    #         f'Ингредиент "{ingredient}" уже существует'))
-
         except FileNotFoundError:
             raise CommandError('Файл с данными не найден')
         except Exception as e:

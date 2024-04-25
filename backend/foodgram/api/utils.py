@@ -4,6 +4,7 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import NotFound
 
+
 def send_message_to_user(username, recipient_email, confirmation_code):
     send_mail(
         subject='Код подтверждения Foodgram',
@@ -22,7 +23,6 @@ def send_message_to_user(username, recipient_email, confirmation_code):
 
 
 def make_confirmation_code(data):
-    # print('!!!!!!!!!!!!!!!! Для создания кода поступило: ', data)
     confirmation_code = default_token_generator.make_token(data)
     return confirmation_code
 

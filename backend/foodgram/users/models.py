@@ -3,12 +3,12 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from foodgram.constants import (
-    MAX_NAME_LENGTH, MAX_EMAIL_LENGTH
-)
+from foodgram.constants import (MAX_NAME_LENGTH,
+                                MAX_EMAIL_LENGTH)
 
 
 class User(AbstractUser):
+    """Модель пользователя"""
     REQUIRED_FIELDS = ('username', 'last_name', 'first_name',)
     USERNAME_FIELD = 'email'
 
@@ -49,8 +49,8 @@ class User(AbstractUser):
         return super().clean()
 
 
-# Create your models here.
 class Subscribe(models.Model):
+    """Модель подписок"""
     user = models.ForeignKey(User, verbose_name='Подписчик',
                              on_delete=models.CASCADE,
                              related_name="subscriber")
@@ -68,7 +68,7 @@ class Subscribe(models.Model):
             )
         ]
 
-    def clean(self): ########## 20042024
+    def clean(self):
         if self.user == self.author:
             raise ValidationError('Нельзя подписываться на самого себя.')
 

@@ -1,13 +1,20 @@
 import os
 from pathlib import Path
 
+# from dotenv import load_dotenv
+
+# load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-APP_DIR  = Path(__file__).resolve().parent.parent
+APP_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-m-sn$(*ln0(c^qd!4@@!7gix^p+@2amg9i_wr^c8vez(zihtwn'
-
+# SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = True
+# DEBUG = os.getenv('DEBUG')
 
+#ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.121.132', '192.168.79.135',
+#                 '158.160.28.213']
 #ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'backend', '192.168.121.133', 'foodgram-so.ddns.net', '158.160.28.213']
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'foodgram-so.ddns.net', 'backend']
 
@@ -38,8 +45,8 @@ MIDDLEWARE = [
 ]
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'collected_static'
-
+STATIC_ROOT = APP_DIR / 'collected_static'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -63,20 +70,30 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-DATABASES = {
-    'default': {
-        # Меняем настройку Django: теперь для работы будет использоваться
-        # бэкенд postgresql
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'django'),
-        'USER': os.getenv('POSTGRES_USER', 'django'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', ''),
-        'PORT': os.getenv('DB_PORT', 5432)
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'postgresql': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('POSTGRES_DB', 'django'),
+            'USER': os.getenv('POSTGRES_USER', 'django'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', ''),
+            'PORT': os.getenv('DB_PORT', 5432)
+        }
+
+    }
 
 AUTH_USER_MODEL = 'users.User'
+
+# Password validation
+# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -100,26 +117,47 @@ DJOSER = {
         'user': 'users.serializers.UserSerializer',
         'current_user': 'users.serializers.UserSerializer',
     },
+    'PERMISSIONS': {
+        'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
+        # 'user_list': ['rest_framework.permissions.IsAuthenticated'],
+        'user': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
+        # 'token': ['rest_framework.permissions.IsAuthenticated'],
+    },
 }
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-       'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS':
         'api.paginator.CustomPagination',
-        'PAGE_SIZE': 6,
-        "PAGE_SIZE_QUERY_PARAM": 'limit',
+    'PAGE_SIZE': 6,
+    "PAGE_SIZE_QUERY_PARAM": 'limit',
 }
 
+# Internationalization
+# https://docs.djangoproject.com/en/5.0/topics/i18n/
+
 LANGUAGE_CODE = 'ru-RU'
+
 TIME_ZONE = 'UTC'
+
 USE_I18N = True
+
 USE_TZ = True
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.0/howto/static-files/
+
+
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 DEFAULT_FROM_EMAIL = 'foodgram_project@email.com'
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
