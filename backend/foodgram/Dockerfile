@@ -10,4 +10,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "foodgram.wsgi:application"]
+RUN python manage.py makemigrations
+
+RUN python manage.py migrate
+
+# RUN python manage.py load_data_tag
+
+# RUN python manage.py recipes/management/commands/load_data_tag.py
+
+# sudo docker compose exec backend python manage.py load_data_ingrediend
+
+
+CMD ["gunicorn", "--bind", "0.0.0.0:9000", "foodgram.wsgi:application"]

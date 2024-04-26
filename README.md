@@ -42,6 +42,9 @@ sudo docker-compose up -d --build
 sudo docker-compose exec backend python manage.py migrate
 ! sudo docker exec infra_backend_1 python manage.py makemigrations
 ! sudo docker exec infra_backend_1 python manage.py migrate
+
+! sudo docker exec foodgram-backend-1 python manage.py makemigrations
+! sudo docker exec foodgram-backend-1 python manage.py migrate
 ```
 5. Создайте суперюзера и соберите статику:
 ```
@@ -49,6 +52,9 @@ sudo docker-compose exec backend python manage.py createsuperuser
 sudo docker-compose exec backend python manage.py collectstatic --no-input
 ! sudo docker exec -it infra_backend_1 python manage.py createsuperuser
 ! sudo docker exec infra_backend_1 python manage.py collectstatic --no-input
+! sudo docker exec foodgram-backend-1 python manage.py createsuperuser
+! sudo docker exec foodgram-backend-1 python manage.py collectstatic --no-input
+! sudo docker exec foodgram-backend-1 cp -r /app/collected_static/. /static/static/
 ```
 6. - Наполнить базу данных тегами и ингредиентами:
 ```
