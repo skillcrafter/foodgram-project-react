@@ -54,7 +54,7 @@ sudo docker-compose exec backend python manage.py collectstatic --no-input
  sudo docker exec infra_backend_1 python manage.py collectstatic --no-input
 ! sudo docker exec foodgram-backend-1 python manage.py createsuperuser
 ! sudo docker exec foodgram-backend-1 python manage.py collectstatic --no-input
-! sudo docker exec foodgram-backend-1 cp -r /app/collected_static/. /static/static/
+!!! sudo docker exec foodgram-backend-1 cp -r /app/backend_static/. /static/static/
 ```
 6. - Наполнить базу данных тегами и ингредиентами:
 ```
