@@ -13,7 +13,7 @@ SECRET_KEY = 'django-insecure-m-sn$(*ln0(c^qd!4@@!7gix^p+@2amg9i_wr^c8vez(zihtwn
 DEBUG = True
 # DEBUG = os.getenv('DEBUG')
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.121.132', '192.168.79.135',
-                 '158.160.28.213', 'backend']
+                 '158.160.28.213', 'backend', 'foodgram-so.ddns.net']
 # ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'fooddotgram.ddns.net', 'backend']
 
 
