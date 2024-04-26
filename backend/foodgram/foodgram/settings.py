@@ -12,12 +12,10 @@ SECRET_KEY = 'django-insecure-m-sn$(*ln0(c^qd!4@@!7gix^p+@2amg9i_wr^c8vez(zihtwn
 # SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = True
 # DEBUG = os.getenv('DEBUG')
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.121.132', '192.168.79.135',
+                 '158.160.28.213', 'backend']
+# ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'fooddotgram.ddns.net', 'backend']
 
-#ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.121.132', '192.168.79.135',
-#                 '158.160.28.213']
-#ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'backend', '192.168.121.133', 'foodgram-so.ddns.net', '158.160.28.213']
-#ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'foodgram-so.ddns.net', 'backend']
-ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'recipes.apps.RecipesConfig',
@@ -71,23 +69,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+# if DEBUG:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
+# else:
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'django'),
+        'USER': os.getenv('POSTGRES_USER', 'django'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', ''),
+        'PORT': os.getenv('DB_PORT', 5432)
     }
-else:
-    DATABASES = {
-        'postgresql': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('POSTGRES_DB', 'django'),
-            'USER': os.getenv('POSTGRES_USER', 'django'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-            'HOST': os.getenv('DB_HOST', ''),
-            'PORT': os.getenv('DB_PORT', 5432)
-        }
 
     }
 
@@ -118,14 +117,12 @@ DJOSER = {
         'user': 'users.serializers.UserSerializer',
         'current_user': 'users.serializers.UserSerializer',
     },
-    # 'PERMISSIONS': {                 # здесь ужас, так как пробовала разное
-    #     'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
-    #     'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
-          'user_list': ['rest_framework.permissions.AllowAny'],
-    #     'user': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
-          'user': ['rest_framework.permissions.AllowAny'],
-          # 'token': ['rest_framework.permissions.IsAuthenticated'],
-    # },
+    'PERMISSIONS': {
+        'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
+        # 'user_list': ['rest_framework.permissions.IsAuthenticated'],
+        'user': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
+        # 'token': ['rest_framework.permissions.IsAuthenticated'],
+    },
 }
 
 REST_FRAMEWORK = {

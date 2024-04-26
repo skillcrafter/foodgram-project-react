@@ -12,7 +12,7 @@ class Command(BaseCommand):
             {'name': 'Ужин', 'color': '#c8fz41', 'slug': 'supper'},
         ]
         for item in data:
-            tag, created = Tag.objects.get_or_created(**item)
+            tag, created = Tag.objects.get_or_create(**item)
             if created:
                 self.stdout.write(self.style.SUCCESS(
                     f'Тег "{tag}" успешно создан'

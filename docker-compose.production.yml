@@ -4,6 +4,7 @@ volumes:
   pg_data:
   static:
   media:
+  frontend_value:
 
 services:
 
@@ -31,6 +32,7 @@ services:
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - /frontend/:/app/result_build
+      
       - static:/frontend_static
     depends_on: 
       - nginx
