@@ -11,7 +11,7 @@ class Command(BaseCommand):
             file_path = 'data/ingredients.json'
             with open(file_path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
-                successfully_loaded = set() ########## olya 2604204
+                successfully_loaded = set()
                 for item in data:
                     try:
                         ingredient, created = Ingredient.objects.get_or_create(
@@ -24,7 +24,8 @@ class Command(BaseCommand):
                                 f'успешно добавлены'))
                     except Exception as e:
                         self.stderr.write(self.style.ERROR(
-                            f'Ошибка при импорте ингредиента: {e}"{ingredient}"'))
+                            f'Ошибка при импорте ингредиента:'
+                            f' {e}"{ingredient}"'))
             duplicates = [item for item in data if (item['name'],
                                                     item['measurement_unit'])
                           not in successfully_loaded]

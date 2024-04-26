@@ -1,22 +1,12 @@
 import os
 from pathlib import Path
 
-# from dotenv import load_dotenv
-
-# load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 APP_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-m-sn$(*ln0(c^qd!4@@!7gix^p+@2amg9i_wr^c8vez(zihtwn'
-# SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = True
-# DEBUG = os.getenv('DEBUG')
-
-#ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.121.132', '192.168.79.135',
-#                 '158.160.28.213']
-#ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'backend', '192.168.121.133', 'foodgram-so.ddns.net', '158.160.28.213']
-#ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'foodgram-so.ddns.net', 'backend']
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
@@ -47,7 +37,6 @@ MIDDLEWARE = [
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'backend_static'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -110,14 +99,10 @@ DJOSER = {
         'user': 'users.serializers.UserSerializer',
         'current_user': 'users.serializers.UserSerializer',
     },
-    # 'PERMISSIONS': {                 # здесь ужас, так как пробовала разное
-    #     'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
-    #     'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
+    'PERMISSIONS': {
           'user_list': ['rest_framework.permissions.AllowAny'],
-    #     'user': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
           'user': ['rest_framework.permissions.AllowAny'],
-          # 'token': ['rest_framework.permissions.IsAuthenticated'],
-    # },
+    }
 }
 
 REST_FRAMEWORK = {
