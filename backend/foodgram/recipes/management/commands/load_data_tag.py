@@ -7,9 +7,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         data = [
-            {'name': 'Завтрак', 'color': '#c8ff30', 'slug': 'breakfast'},
-            {'name': 'Обед', 'color': '#E26C2D', 'slug': 'dinner'},
-            {'name': 'Ужин', 'color': '#c8fz41', 'slug': 'supper'},
+            {'name': 'Завтрак', 'color': '#2dbd4f', 'slug': 'breakfast'},
+            {'name': 'Обед', 'color': '#2d8fbd', 'slug': 'dinner'},
+            {'name': 'Ужин', 'color': '#cf88db', 'slug': 'supper'},
         ]
         for item in data:
             tag, created = Tag.objects.get_or_create(**item)
