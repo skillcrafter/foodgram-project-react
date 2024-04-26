@@ -4,7 +4,6 @@ volumes:
   pg_data:
   static:
   media:
-  frontend_value:
 
 services:
 
@@ -18,11 +17,11 @@ services:
   backend:
     image: olga1611/foodgram_backend
     env_file: .env
-#    ports:
-#      - "8000:8000"
+    ports:
+      - "9000:8000"
     volumes:
-      - static:/backend_static
       - media:/media/
+      - static:/backend_static
     depends_on: 
       - db
 
@@ -32,30 +31,16 @@ services:
     volumes:
       - ../frontend/:/app/result_build/
 
-#    command: cp -r /app/build/. /frontend_static/
-#    volumes:
-#      - /frontend/:/app/result_build
-#      
-#      - static:/frontend_static
-    depends_on: 
-      - nginx
-
   nginx:
     image: olga1611/foodgram_gateway
     env_file: .env
     volumes:
       - static:/var/html/static/
       - media:/var/html/media/
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./infra/nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend_build:/usr/share/nginx/html/frontend/
       - ../docs/:/usr/share/nginx/html/api/docs/
-
-#      - ./infra/nginx.conf:/etc/nginx/conf.d/ 
-# #      - ./nginx:/etc/nginx/conf.d
-#      - ./frontend/build:/usr/share/nginx/html/
-#      - ./docs/:/usr/share/nginx/html/api/docs/
-#      - static:/staticfiles/
-#      - media:/media/
     ports:
       - "8000:80"
-#      - 8000:80
+    depends_on:
+      - backend
