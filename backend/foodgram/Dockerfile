@@ -21,4 +21,4 @@ COPY . .
 # sudo docker compose exec backend python manage.py load_data_ingrediend
 
 
-CMD ["gunicorn", "--bind", "0.0.0.0:9000", "foodgram.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "foodgram.wsgi:application"]
