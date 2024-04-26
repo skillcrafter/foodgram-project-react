@@ -25,6 +25,7 @@ services:
 
   frontend:
     image: olga1611/foodgram_frontend
+    container_name: foodgram_frontend
     env_file: .env
     volumes:
       - ../frontend/:/app/result_build/
