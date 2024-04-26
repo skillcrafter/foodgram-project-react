@@ -22,7 +22,7 @@ services:
       - media:/app/media
       - static:/app/backend_static
     depends_on:
-        - db
+      - db
 
   frontend:
     image: olga1611/foodgram_frontend
@@ -40,5 +40,5 @@ services:
       - ../docs/:/usr/share/nginx/html/api/docs/
       - static:/var/html/static/
       - media:/var/html/media/
-    depends_on:
-      - frontend
+#    depends_on:
+#      - frontend
