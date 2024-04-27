@@ -4,8 +4,8 @@ from rest_framework.routers import DefaultRouter
 from .views import (IngredientsViewSet,
                     RecipesViewSet,
                     TagViewSet,
+                    UserViewSet,
                     )
-from users.views import UserViewSet
 
 api_v1 = DefaultRouter()
 api_v1.register(r'ingredients', IngredientsViewSet, basename='ingredients')
