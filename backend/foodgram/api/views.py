@@ -48,7 +48,7 @@ class IngredientsViewSet(ReadOnlyModelViewSet):
 
 class RecipesViewSet(viewsets.ModelViewSet):
     """Вьюсет для рецептов."""
-    permission_classes = (IsAuthenticatedForWrite,)
+    # permission_classes = (IsAuthenticatedForWrite,)
     queryset = Recipe.objects.all()
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
