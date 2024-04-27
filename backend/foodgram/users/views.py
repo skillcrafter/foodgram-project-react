@@ -18,6 +18,11 @@ from .serializers import (
 from djoser import views as djoser_views
 
 
+
+================== TEST
+
+
+
 class UserViewSet(djoser_views.UserViewSet):
     """Вьюсет для пользователей."""
     queryset = User.objects.all()
