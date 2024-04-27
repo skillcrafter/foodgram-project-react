@@ -8,7 +8,7 @@ from rest_framework.permissions import (
 from rest_framework.response import Response
 
 
-from api.paginator import CustomPagination
+from ..api.paginator import CustomPagination
 from .models import Subscribe, User
 from .serializers import (
     SubscribeSerializer,
