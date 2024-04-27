@@ -15,7 +15,7 @@ from .serializers import (
     UserSerializer
 )
 from djoser import views as djoser_views
-111
+
 
 class UserViewSet(djoser_views.UserViewSet):
     """Вьюсет для пользователей."""
