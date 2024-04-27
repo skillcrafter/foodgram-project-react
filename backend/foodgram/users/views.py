@@ -16,7 +16,7 @@ from .serializers import (
 )
 from djoser import views as djoser_views
 1
-
+33
 class UserViewSet(djoser_views.UserViewSet):
     """Вьюсет для пользователей."""
     queryset = User.objects.all()
