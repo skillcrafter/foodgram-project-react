@@ -1,6 +1,6 @@
-from django.core.validators import RegexValidator
 from rest_framework import serializers
 
+from api.validators import username_validator
 from recipes.models import Recipe
 from users.models import Subscribe, User
 
@@ -12,13 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     username = serializers.CharField(
         max_length=MAX_NAME_LENGTH,
-        validators=[
-            RegexValidator(
-                regex=r'^[\w.@+-]+\Z',
-                message='Invalid username format',
-                code='invalid_username'
-            )
-        ]
+        validators=[username_validator]
     )
     is_subscribed = serializers.SerializerMethodField(read_only=True)
 
@@ -34,14 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         return user.is_authenticated and user.subscriber.filter(
             author=obj.id
-        ).exists() or False
-
-    def to_representation(self, instance):
-        """Преобразование объекта модели в представление."""
-        representation = super().to_representation(instance)
-        if instance == self.context.get('request').user:
-            representation['is_subscribed'] = False
-        return representation
+        ).exists()
 
 
 class RecipeShortSerializer(serializers.ModelSerializer):
@@ -106,6 +93,14 @@ class SubscribeSerializer(serializers.ModelSerializer):
             'user',
             'author'
         )
+
+    # def validate(self, data):
+    #     user = self.context['request'].user
+    #     author = data['author']
+    #     if user == author:
+    #         raise serializers.ValidationError("Вы не можете подписаться на "
+    #                                           "самого себя")
+    #     return data
 
     def to_representation(self, instance):
         request = self.context.get('request')

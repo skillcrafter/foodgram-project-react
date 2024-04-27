@@ -1,12 +1,20 @@
 from rest_framework import permissions
 
 
-class IsAuthenticatedForWrite(permissions.BasePermission):
+class AutherOrReadOnly(permissions.BasePermission):
     """
-    Пользовательский фильтр, требующий аутентификацию для записи данных.
+    Кастомный пермишен, который разрешает полный доступ к объекту только
+    автору.
     """
 
     def has_permission(self, request, view):
-        if request.method == 'GET':
-            return True
-        return request.user and request.user.is_authenticated
+        return (
+            request.method in permissions.SAFE_METHODS
+            or request.user.is_authenticated
+        )
+
+    def has_object_permission(self, request, view, obj):
+        return (
+            request.method in permissions.SAFE_METHODS
+            or obj.author == request.user
+        )

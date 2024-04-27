@@ -81,12 +81,12 @@ class UserViewSet(djoser_views.UserViewSet):
                 )
             serializer = self.get_serializer(subscription)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if request.method == 'DELETE':
-            if not subscription.exists():
-                return Response(
-                    {'error': 'Вы не подписаны на этого автора!'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            subscription.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        # if request.method == 'DELETE':
+        if not subscription.exists():
+            return Response(
+                {'error': 'Вы не подписаны на этого автора!'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        subscription.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+        # return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

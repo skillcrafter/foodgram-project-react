@@ -85,7 +85,7 @@ class Migration(migrations.Migration):
             name='ShoppingCart',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('recipe', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='ShoppingCarts', to='recipes.recipe', verbose_name='Рецепт')),
+                ('recipe', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='shopping_carts', to='recipes.recipe', verbose_name='Рецепт')),
             ],
             options={
                 'verbose_name': 'Список покупок',

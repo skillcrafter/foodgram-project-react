@@ -1,7 +1,5 @@
-from django_filters.rest_framework import FilterSet, filters
-
 from django.contrib.auth import get_user_model
-
+from django_filters.rest_framework import FilterSet, filters
 from recipes.models import Recipe, Tag
 
 User = get_user_model()
@@ -32,5 +30,5 @@ class RecipeFilter(FilterSet):
 
     def get_is_in_shopping_cart(self, queryset, name, value):
         if self.request.user.is_authenticated and value:
-            return queryset.filter(ShoppingCarts__user=self.request.user)
+            return queryset.filter(shopping_carts__user=self.request.user)
         return queryset

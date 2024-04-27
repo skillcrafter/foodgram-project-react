@@ -5,7 +5,7 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import (AuthenticationFailed,
                                        PermissionDenied)
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
@@ -20,7 +20,7 @@ from recipes.models import (
 from users.models import User
 from .filters import RecipeFilter
 from .paginator import CustomPagination
-from .permissions import IsAuthenticatedForWrite
+from .permissions import AutherOrReadOnly
 from .serializers import (
     CreateRecipeSerializer,
     FavoriteSerializer,
@@ -48,7 +48,7 @@ class IngredientsViewSet(ReadOnlyModelViewSet):
 
 class RecipesViewSet(viewsets.ModelViewSet):
     """Вьюсет для рецептов."""
-    permission_classes = (IsAuthenticatedForWrite,)
+    permission_classes = (AutherOrReadOnly,)
     queryset = Recipe.objects.all()
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
@@ -63,8 +63,8 @@ class RecipesViewSet(viewsets.ModelViewSet):
             author = get_object_or_404(User, pk=author_id)
             queryset = queryset.filter(author=author)
         if tags:
-            for tag in tags:
-                queryset = queryset.filter(tags__slug=tag)
+            tag_filters = {'tags__slug__in': tags}
+            queryset = queryset.filter(**tag_filters)
         return queryset
 
     def get_serializer_class(self):
@@ -77,34 +77,35 @@ class RecipesViewSet(viewsets.ModelViewSet):
         context.update({'request': self.request})
         return context
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if not request.user.is_authenticated:
-            raise AuthenticationFailed(
-                "Требуется аутентификация для удаления рецепта.")
-        if instance.author != request.user:
-            raise PermissionDenied(
-                "Вы не являетесь автором этого рецепта.")
-        instance.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    # def destroy(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     if not request.user.is_authenticated:
+    #         raise AuthenticationFailed(
+    #             "Требуется аутентификация для удаления рецепта.")
+    #     if instance.author != request.user:
+    #         raise PermissionDenied(
+    #             "Вы не являетесь автором этого рецепта.")
+    #     instance.delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
         detail=True,
         methods=['post', 'delete'],
         url_path='shopping_cart',
-        permission_classes=(IsAuthenticated,),
+        # permission_classes=(IsAuthenticated,),
     )
     def shopping_cart(self, request, pk=None):
         try:
-            recipe = Recipe.objects.get(pk=pk)  #
-        except Recipe.DoesNotExist:  #
+            recipe = Recipe.objects.get(pk=pk)
+        except Recipe.DoesNotExist:
             if request.method == 'POST':
-                return Response({'error': 'Рецепт не существует.'},
-                                status=status.HTTP_400_BAD_REQUEST)
+                responce_status = status.HTTP_400_BAD_REQUEST
             else:
-                return Response({'error': 'Рецепт не существует.'},
-                                status=status.HTTP_404_NOT_FOUND)
-
+                responce_status = status.HTTP_404_NOT_FOUND
+            return Response(
+                {'error': 'Рецепт не существует.'},
+                responce_status
+            )
         if request.method == 'POST':
             serializer = ShoppingCartSerializer(
                 data={
@@ -112,29 +113,23 @@ class RecipesViewSet(viewsets.ModelViewSet):
                     'recipe': pk
                 }
             )
-            if serializer.is_valid():
-                serializer.save()
-                return Response(
-                    serializer.data,
-                    status=status.HTTP_201_CREATED
-                )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
             return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
+                serializer.data,
+                status=status.HTTP_201_CREATED
             )
 
-        elif request.method == 'DELETE':
-            try:
-                shopping_cart_item = ShoppingCart.objects.get(
-                    user=request.user,
-                    recipe=recipe
-                )
-                shopping_cart_item.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            except ShoppingCart.DoesNotExist:
-                return Response(
-                    {'error': 'Рецепт не найден в списке покупок.'},
-                    status=status.HTTP_400_BAD_REQUEST)
+        try:
+            shopping_cart_item = ShoppingCart.objects.get(
+                user=request.user,
+                recipe=recipe)
+            shopping_cart_item.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except ShoppingCart.DoesNotExist:
+            return Response(
+                {'error': 'Рецепт не найден в списке покупок.'},
+                status=status.HTTP_400_BAD_REQUEST)
 
     def generate_shopping_list(self, user):
         recipes = ShoppingCart.objects.filter(
@@ -156,7 +151,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
                                              measurement_unit)
                     }
                 else:
-                    ingredients[ingredient_name]['amount']\
+                    ingredients[ingredient_name]['amount'] \
                         += recipe_ingredient.amount
 
         return ingredients
@@ -165,7 +160,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         detail=False,
         methods=['get'],
         url_path='download_shopping_cart',
-        permission_classes=(IsAuthenticated,),
+        # permission_classes=(IsAuthenticated,),
     )
     def download_shopping_cart(self, request):
         user = request.user
@@ -188,7 +183,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         detail=True,
         methods=['post', 'delete'],
         url_path='favorite',
-        permission_classes=(IsAuthenticated,),
+        # permission_classes=(IsAuthenticated,),
     )
     def favorite(self, request, pk):
         if request.method == 'POST':

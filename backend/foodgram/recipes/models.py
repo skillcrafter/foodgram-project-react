@@ -95,7 +95,6 @@ class Recipe(models.Model):
     )
     tags = models.ManyToManyField(
         Tag,
-        # through='RecipeTag',
         related_name='recipes',
         verbose_name='Тег',
     )
@@ -114,13 +113,13 @@ class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='recipe_ingredient',
+        related_name='recipe_ingredients',
         verbose_name='Рецепт',
     )
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        related_name='recipe_ingredient',
+        related_name='recipe_ingredients',
         verbose_name='Ингредиент',
     )
     amount = models.PositiveSmallIntegerField(
@@ -131,6 +130,12 @@ class RecipeIngredient(models.Model):
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты в рецепте'
+        constraints = [
+            UniqueConstraint(
+                fields=['recipe', 'ingredient'],
+                name='recipe_ingredient_unique'
+            )
+        ]
 
     def __str__(self):
         return (
@@ -177,13 +182,13 @@ class ShoppingCart(models.Model):
         User,
         on_delete=models.CASCADE,
         null=True,
-        related_name='ShoppingCarts',
+        related_name='shopping_carts',
         verbose_name='Пользователь',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='ShoppingCarts',
+        related_name='shopping_carts',
         verbose_name='Рецепт',
     )
 
