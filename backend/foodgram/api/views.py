@@ -5,7 +5,10 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import (
+    IsAuthenticated,
+    AllowAny
+)
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
@@ -116,7 +119,6 @@ class IngredientsViewSet(ReadOnlyModelViewSet):
         queryset = self.queryset
         if name_starts_with:
             queryset = queryset.filter(name__istartswith=name_starts_with)
-
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 

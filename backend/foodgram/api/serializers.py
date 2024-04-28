@@ -47,7 +47,11 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'email', 'id', 'username', 'first_name', 'last_name',
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
             'is_subscribed'
         )
 
@@ -174,11 +178,14 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializer(read_only=True)
     ingredients = RecipesIngredientsSerializer(many=True,
-                                               source='recipe_ingredients')
+                                               source='recipe_ingredients'
+                                               )
     is_favorited = serializers.SerializerMethodField(
-        method_name='get_is_favorited')
+        method_name='get_is_favorited'
+    )
     is_in_shopping_cart = serializers.SerializerMethodField(
-        method_name='get_is_in_shopping_cart')
+        method_name='get_is_in_shopping_cart'
+    )
 
     class Meta:
         model = Recipe
