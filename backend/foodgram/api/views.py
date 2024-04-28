@@ -1,3 +1,4 @@
+from django.db.models import Sum
 from djoser import views as djoser_views
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -96,7 +97,6 @@ class UserViewSet(djoser_views.UserViewSet):
                 )
             serializer = self.get_serializer(subscription)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # if request.method == 'DELETE':
         if not subscription.exists():
             return Response(
                 {'error': 'Вы не подписаны на этого автора!'},
@@ -104,7 +104,6 @@ class UserViewSet(djoser_views.UserViewSet):
             )
         subscription.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-        # return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class IngredientsViewSet(ReadOnlyModelViewSet):
@@ -136,8 +135,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         author_id = self.request.query_params.get('author')
         tags = self.request.query_params.getlist('tags')
         if author_id:
-            author = get_object_or_404(User, pk=author_id)
-            queryset = queryset.filter(author=author)
+            queryset = queryset.filter(author_id=author_id)
         if tags:
             tag_filters = {'tags__slug__in': tags}
             queryset = queryset.filter(**tag_filters)
@@ -153,37 +151,39 @@ class RecipesViewSet(viewsets.ModelViewSet):
         context.update({'request': self.request})
         return context
 
-    # def destroy(self, request, *args, **kwargs):
-    #     instance = self.get_object()
-    #     if not request.user.is_authenticated:
-    #         raise AuthenticationFailed(
-    #             "Требуется аутентификация для удаления рецепта.")
-    #     if instance.author != request.user:
-    #         raise PermissionDenied(
-    #             "Вы не являетесь автором этого рецепта.")
-    #     instance.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
+    def get_recipe_or_error_response(self, pk, method):
+        try:
+            recipe = Recipe.objects.get(pk=pk)
+        except Recipe.DoesNotExist:
+            if method == 'POST':
+                return Response(
+                    {'error': 'Рецепт не существует.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            else:
+                return Response(
+                    {'error': 'Рецепт не существует.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        return recipe
 
-    @action(
-        detail=True,
-        methods=['post', 'delete'],
-        url_path='shopping_cart',
-        # permission_classes=(IsAuthenticated,),
-    )
-    def shopping_cart(self, request, pk=None):
+    def action_request(self, request, serializer_class, model_class, pk=None):
         try:
             recipe = Recipe.objects.get(pk=pk)
         except Recipe.DoesNotExist:
             if request.method == 'POST':
-                responce_status = status.HTTP_400_BAD_REQUEST
+                return Response(
+                    {'error': 'Рецепт не существует.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             else:
-                responce_status = status.HTTP_404_NOT_FOUND
-            return Response(
-                {'error': 'Рецепт не существует.'},
-                responce_status
-            )
+                return Response(
+                    {'error': 'Рецепт не существует.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
         if request.method == 'POST':
-            serializer = ShoppingCartSerializer(
+            serializer = serializer_class(
                 data={
                     'user': request.user.id,
                     'recipe': pk
@@ -195,48 +195,65 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 serializer.data,
                 status=status.HTTP_201_CREATED
             )
-
         try:
-            shopping_cart_item = ShoppingCart.objects.get(
+            instance = model_class.objects.get(
                 user=request.user,
-                recipe=recipe)
-            shopping_cart_item.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except ShoppingCart.DoesNotExist:
+                recipe=recipe
+            )
+            instance.delete()
             return Response(
-                {'error': 'Рецепт не найден в списке покупок.'},
-                status=status.HTTP_400_BAD_REQUEST)
+                status=status.HTTP_204_NO_CONTENT
+            )
+        except model_class.DoesNotExist:
+            return Response(
+                {'error': 'Рецепт не найден.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @action(
+        detail=True,
+        methods=['post', 'delete'],
+        url_path='shopping_cart',
+        permission_classes=(IsAuthenticated,),
+    )
+    def shopping_cart(self, request, pk=None):
+        return self.action_request(
+            request,
+            ShoppingCartSerializer,
+            ShoppingCart,
+            pk
+        )
 
     def generate_shopping_list(self, user):
         recipes = ShoppingCart.objects.filter(
             user=user
         ).values_list('recipe', flat=True)
 
-        ingredients = {}
-        for recipe in recipes:
-            print(recipe)
-            recipe_ingredients = RecipeIngredient.objects.filter(
-                recipe=recipe
+        ingredients = (
+            RecipeIngredient.objects.filter(recipe__in=recipes)
+            .values('ingredient__name', 'ingredient__measurement_unit')
+            .annotate(
+                total_amount=Sum('amount')
             )
-            for recipe_ingredient in recipe_ingredients:
-                ingredient_name = recipe_ingredient.ingredient.name
-                if ingredient_name not in ingredients:
-                    ingredients[ingredient_name] = {
-                        'amount': recipe_ingredient.amount,
-                        'measurement_unit': (recipe_ingredient.ingredient.
-                                             measurement_unit)
-                    }
-                else:
-                    ingredients[ingredient_name]['amount'] \
-                        += recipe_ingredient.amount
+        )
 
-        return ingredients
+        shopping_list = {}
+        for ingredient in ingredients:
+            ingredient_name = ingredient['ingredient__name']
+            total_amount = ingredient['total_amount']
+            measurement_unit = ingredient['ingredient__measurement_unit']
+            shopping_list[ingredient_name] = {
+                'amount': total_amount,
+                'measurement_unit': measurement_unit
+            }
+
+        return shopping_list
 
     @action(
         detail=False,
         methods=['get'],
         url_path='download_shopping_cart',
-        # permission_classes=(IsAuthenticated,),
+
     )
     def download_shopping_cart(self, request):
         user = request.user
@@ -259,59 +276,15 @@ class RecipesViewSet(viewsets.ModelViewSet):
         detail=True,
         methods=['post', 'delete'],
         url_path='favorite',
-        # permission_classes=(IsAuthenticated,),
+        permission_classes=(IsAuthenticated,),
     )
     def favorite(self, request, pk):
-        if request.method == 'POST':
-            try:
-                recipe = Recipe.objects.get(pk=pk)
-            except Recipe.DoesNotExist:
-                return Response({'error': 'Рецепт не существует.'},
-                                status=status.HTTP_400_BAD_REQUEST)
-
-            serializer = FavoriteSerializer(
-                data={'user': request.user.id, 'recipe': pk}
-            )
-            if serializer.is_valid():
-                serializer.save()
-                return Response(
-                    serializer.data,
-                    status=status.HTTP_201_CREATED
-                )
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        elif request.method == 'DELETE':
-            try:
-                recipe = Recipe.objects.get(pk=pk)
-            except Recipe.DoesNotExist:
-                return Response({'error': 'Рецепт не существует.'},
-                                status=status.HTTP_404_NOT_FOUND)
-            try:
-                shopping_cart_item = Favorite.objects.get(
-                    user=request.user,
-                    recipe=recipe
-                )
-                shopping_cart_item.delete()
-                return Response(
-                    status=status.HTTP_204_NO_CONTENT
-                )
-            except Favorite.DoesNotExist:
-                return Response(
-                    {'error': 'Рецепт не найден в списке покупок.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        return {
-            "id": representation['id'],
-            "name": representation['name'],
-            "color": representation['color'],
-            "slug": representation['slug'],
-        }
+        return self.action_request(
+            request,
+            FavoriteSerializer,
+            Favorite,
+            pk
+        )
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -319,6 +292,3 @@ class TagViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
-
-
-

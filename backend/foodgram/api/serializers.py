@@ -111,22 +111,12 @@ class SubscribeSerializer(serializers.ModelSerializer):
             'author'
         )
 
-    # def validate(self, data):
-    #     user = self.context['request'].user
-    #     author = data['author']
-    #     if user == author:
-    #         raise serializers.ValidationError("Вы не можете подписаться на "
-    #                                           "самого себя")
-    #     return data
-
     def to_representation(self, instance):
         request = self.context.get('request')
         return SubscriptionSerializer(
             instance.author,
             context={'request': request}
         ).data
-
-
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -160,8 +150,6 @@ class AddIngredientRecipeSerializer(serializers.ModelSerializer):
     """ Сериализатор добавления ингредиента в рецепт. """
 
     id = serializers.IntegerField()
-
-    # amount = serializers.IntegerField()
 
     class Meta:
         model = RecipeIngredient
@@ -207,17 +195,12 @@ class RecipeSerializer(serializers.ModelSerializer):
             'cooking_time'
         ]
 
-    # def get_ingredients(self, obj):
-    #     ingredients = RecipeIngredient.objects.filter(recipe=obj)
-    #     return RecipesIngredientsSerializer(ingredients, many=True).data
-
     def get_is_favorited(self, obj):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
         return Favorite.objects.filter(
-            user=request.user, recipe_id=obj.id  # Замечание 238 (api->view.py)
-            #  Заменен obj на obj.id
+            user=request.user, recipe_id=obj.id
         ).exists()
 
     def get_is_in_shopping_cart(self, obj):
@@ -225,11 +208,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         if request is None or request.user.is_anonymous:
             return False
         return ShoppingCart.objects.filter(
-            user=request.user, recipe_id=obj.id  # Замечание 238 (api->view.py)
-            #  Заменен obj на obj.id
+            user=request.user, recipe_id=obj.id
         ).exists()
-
-
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
@@ -343,30 +323,12 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        request = self.context.get('request')
-        # if instance.author == request.user and 'tags' not in validated_data:
-        #     raise ValidationError(
-        #         "Поле 'tags' обязательно для обновления рецепта."
-        #     )
-        # if not request.user.is_authenticated:
-        #     raise AuthenticationFailed(
-        #         "Требуется аутентификация для обновления рецепта."
-        #     )
-        # if instance.author != request.user:
-        #     raise PermissionDenied(
-        #         "Вы не являетесь автором этого рецепта.")
-
         RecipeTag.objects.filter(recipe=instance).delete()
         RecipeIngredient.objects.filter(recipe=instance).delete()
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         self.create_ingredients(ingredients, instance)
         self.create_tags(tags, instance)
-        # instance.name = validated_data.pop('name')
-        # instance.text = validated_data.pop('text')
-        # if validated_data.get('image'):
-        #     instance.image = validated_data.pop('image')
-        # instance.cooking_time = validated_data.pop('cooking_time')
         return super().update(instance, validated_data)
         instance.save()
         return instance
@@ -421,5 +383,3 @@ class FavoriteSerializer(serializers.ModelSerializer):
         return FavoriteListSerializer(instance.recipe, context={
             'request': self.context.get('request')
         }).data
-
-
