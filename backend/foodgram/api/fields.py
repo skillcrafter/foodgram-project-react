@@ -30,4 +30,3 @@ class Hex2NameColor(serializers.Field):
         if not re.match(r'^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$', data):
             raise serializers.ValidationError('Неверный формат RGB цвета')
         return data
-
