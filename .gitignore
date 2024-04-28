@@ -129,6 +129,6 @@ dmypy.json
 .pyre/
 
 # .idea
-.idea
+.idea 
 /postman-collection/
 /backend/foodgram/media/
