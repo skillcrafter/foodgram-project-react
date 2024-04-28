@@ -243,7 +243,7 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
 class CreateRecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для краткой информации о рецептах."""
     author = UserSerializer(read_only=True)
-    ingredients = AddIngredientRecipeSerializer(many=True)
+    ingredients = ingredients = AddIngredientRecipeSerializer(many=True)
     image = Base64ImageField()
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
@@ -277,28 +277,34 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
             Ingredient.objects.values_list('id', flat=True)
         )
 
+        id_list = []
         for ingredient_data in ingredients:
             ingredient_id = ingredient_data.get('id')
-            if ingredient_id not in existing_ingredient_ids:
+            if ingredient_id and ingredient_id not in existing_ingredient_ids:
                 raise serializers.ValidationError(
-                    {'ingredients': f'Ингредиент с '
-                                    f'id={ingredient_id} не существует'}
+                    {
+                        'ingredients': f'Ингредиент с id={ingredient_id} '
+                                       f'не существует'}
                 )
-        if len(tags) != len(set(tags)):
-            raise serializers.ValidationError("Теги не должны повторяться.")
-
-        id_list = []
-        for i in ingredients:
-            amount = i['amount']
+            if not ingredient_id:
+                raise serializers.ValidationError(
+                    {
+                        'ingredients': 'Идентификатор ингредиента должен '
+                                       'быть предоставлен'}
+                )
+            amount = ingredient_data.get('amount')
             if int(amount) < 1:
                 raise serializers.ValidationError({
                     'amount': 'Количество ингредиента должно быть больше 0!'
                 })
-            if i['id'] in id_list:
+            if ingredient_id in id_list:
                 raise serializers.ValidationError({
                     'ingredient': 'Ингредиенты должны быть уникальными!'
                 })
-            id_list.append(i['id'])
+            id_list.append(ingredient_id)
+
+        if len(tags) != len(set(tags)):
+            raise serializers.ValidationError("Теги не должны повторяться.")
 
         return data
 

@@ -153,22 +153,6 @@ class RecipesViewSet(viewsets.ModelViewSet):
         context.update({'request': self.request})
         return context
 
-    def get_recipe_or_error_response(self, pk, method):
-        try:
-            recipe = Recipe.objects.get(pk=pk)
-        except Recipe.DoesNotExist:
-            if method == 'POST':
-                return Response(
-                    {'error': 'Рецепт не существует.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            else:
-                return Response(
-                    {'error': 'Рецепт не существует.'},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-        return recipe
-
     def action_request(self, request, serializer_class, model_class, pk=None):
         try:
             recipe = Recipe.objects.get(pk=pk)
