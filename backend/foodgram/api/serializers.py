@@ -330,8 +330,6 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         self.create_ingredients(ingredients, instance)
         self.create_tags(tags, instance)
         return super().update(instance, validated_data)
-        instance.save()
-        return instance
 
     def to_representation(self, instance):
         return RecipeSerializer(instance, context={
