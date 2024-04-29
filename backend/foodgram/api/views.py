@@ -139,8 +139,6 @@ class RecipesViewSet(viewsets.ModelViewSet):
         if author_id:
             queryset = queryset.filter(author_id=author_id)
         if tags:
-            print('tags2 = ', tags)
-
             tag_filters = {'tags__slug__in': tags}
             queryset = queryset.filter(**tag_filters)
         return queryset
