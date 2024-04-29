@@ -4,13 +4,10 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 APP_DIR = Path(__file__).resolve().parent.parent
 
-# SECRET_KEY = os.getenv('SECRET_KEY', 'unsafe-secret-key')
-# DEBUG = os.getenv('DEBUG') == 'True'
-# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(' ')
+SECRET_KEY = os.getenv('SECRET_KEY', 'unsafe-secret-key')
+DEBUG = os.getenv('DEBUG') == 'True'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(' ')
 
-SECRET_KEY = 'django-insecure-m-sn$(*ln0(c^qd!4@@!7gix^p+@2amg9i_wr^c8vez(zihtwn'
-DEBUG = True
-ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'recipes.apps.RecipesConfig',
